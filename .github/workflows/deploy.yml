@@ -1,0 +1,53 @@
+# ─── GITHUB ACTIONS — AUTO DEPLOY TO GITHUB PAGES ────────────────────────────
+# Triggers on every push to main branch.
+# Deploys the app to GitHub Pages automatically.
+# ──────────────────────────────────────────────────────────────────────────────
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # allows manual trigger from GitHub UI
+
+permissions:
+  contents: read
+  pages:    write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group:              pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name:        Deploy
+    runs-on:     ubuntu-latest
+    environment:
+      name: github-pages
+      url:  ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+
+      # 1. Checkout the repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Setup GitHub Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      # 3. Upload the entire repo as the Pages artifact
+      #    Since this is a pure static app with no build step,
+      #    we upload the root directory directly.
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      # 4. Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        id:   deployment
+        uses: actions/deploy-pages@v4
