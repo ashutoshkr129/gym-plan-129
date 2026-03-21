@@ -116,19 +116,40 @@ npx serve .
 
 Then open `http://localhost:8000` in Chrome.
 
-### Deploy to Netlify
+### Deploy to GitHub Pages
 
-1. Push repo to GitHub
-2. Go to [netlify.com](https://netlify.com) → New site from Git
-3. Select your repo → Deploy
-4. Open the Netlify URL on your Android phone in Chrome
-5. Tap **Add to Home Screen** when prompted
+This repo uses GitHub Actions to auto deploy on every push to `main`. No manual steps needed after initial setup.
+
+**One time setup:**
+
+1. Create a new public repository named `gym-plan-129` on GitHub — do NOT initialize with README
+2. Go to repo **Settings** → **Pages** → set Source to **GitHub Actions** → Save
+3. Push the code:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit — gym plan 129"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/gym-plan-129.git
+git push -u origin main
+```
+
+4. Go to the **Actions** tab in your repo and watch the workflow run
+5. Once green your app is live at:
+
+```
+https://YOUR_USERNAME.github.io/gym-plan-129/
+```
+
+Every future push to `main` auto deploys — no manual steps ever again.
 
 ### Install on Android
 
-1. Open the hosted URL in Chrome on Android
+1. Open `https://YOUR_USERNAME.github.io/gym-plan-129/` in Chrome on your phone
 2. Tap the three dot menu → **Add to Home Screen**
 3. Or wait for the install banner to appear automatically
+4. The app works fully offline after first load
 
 ---
 
@@ -145,9 +166,21 @@ To personalise for someone else, update `data/exercises.js`, `data/meals.js`, an
 
 ---
 
+## CI/CD
+
+GitHub Actions workflow is at `.github/workflows/deploy.yml`.
+
+It triggers on every push to `main` and deploys to GitHub Pages automatically using the official `actions/deploy-pages` action. No build step needed — pure static files are uploaded directly.
+
+To trigger a manual deploy go to **Actions** tab → **Deploy to GitHub Pages** → **Run workflow**.
+
 ## Updating the App
 
-When you make changes and push to GitHub, bump the cache version in `sw.js`:
+When you make changes:
+
+1. Edit the relevant file
+2. Commit and push to main — GitHub Actions handles the rest
+3. If you update any cached files bump the cache version in `sw.js` so users get the fresh version:
 
 ```js
 const CACHE_NAME   = 'gym-plan-129-v1.0.1'; // increment this
