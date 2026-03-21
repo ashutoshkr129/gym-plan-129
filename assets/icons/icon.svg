@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#0E0E0E"/>
+  <!-- Barbell left weight -->
+  <rect x="48" y="210" width="84" height="92" rx="14" fill="#C8F04A"/>
+  <!-- Barbell right weight -->
+  <rect x="380" y="210" width="84" height="92" rx="14" fill="#C8F04A"/>
+  <!-- Barbell bar -->
+  <rect x="122" y="242" width="268" height="28" rx="8" fill="#C8F04A"/>
+  <!-- Barbell collar left -->
+  <rect x="196" y="192" width="30" height="128" rx="6" fill="#C8F04A"/>
+  <!-- Barbell collar right -->
+  <rect x="286" y="192" width="30" height="128" rx="6" fill="#C8F04A"/>
+  <!-- 129 text -->
+  <text x="256" y="430" font-family="Arial Black, sans-serif" font-size="56" font-weight="900" fill="#C8F04A" text-anchor="middle" letter-spacing="6">129</text>
+</svg>

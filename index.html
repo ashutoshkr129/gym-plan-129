@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0E0E0E" id="themeMetaColor">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Gym Plan">
+  <meta name="description" content="Personalised PPL workout and nutrition plan">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Gym Plan 129</title>
+</head>
+<body>
+
+<!-- ── OFFLINE BANNER ──────────────────────────────────────────────────────── -->
+<div class="offline-banner" id="offlineBanner">
+  No internet — Watch and Guide links won't work offline
+</div>
+
+<!-- ── ONBOARDING OVERLAY ─────────────────────────────────────────────────── -->
+<div class="onboarding-overlay" id="onboardingOverlay">
+  <div class="onboard-icon" id="onboardIcon">👋</div>
+  <div class="onboard-title" id="onboardTitle">Welcome to Gym Plan</div>
+  <div class="onboard-body" id="onboardBody">Your personalised PPL workout and nutrition app.</div>
+  <div class="onboard-dots" id="onboardDots"></div>
+  <button class="onboard-btn" id="onboardBtn" onclick="App.onboardNext()">Get Started</button>
+</div>
+
+<!-- ── SETTINGS OVERLAY ───────────────────────────────────────────────────── -->
+<div class="settings-overlay" id="settingsOverlay" onclick="App.closeSettingsOnBackdrop(event)">
+  <div class="settings-panel">
+
+    <div class="settings-title">
+      Settings
+      <button class="settings-close" onclick="App.toggleSettings()">✕</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Appearance</div>
+      <div class="settings-option">
+        <div>
+          <div class="settings-option-label">Theme</div>
+          <div class="settings-option-sub">Dark or light mode</div>
+        </div>
+        <button class="toggle-btn" id="themeToggleBtn" onclick="App.toggleTheme()">☀ Light</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Workout Logging</div>
+      <div class="settings-option">
+        <div>
+          <div class="settings-option-label">Log Input Style</div>
+          <div class="settings-option-sub">How exercise log appears</div>
+        </div>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="btn-inline" onclick="App.setLogStyle('inline')">Inline</button>
+          <button class="toggle-btn"        id="btn-popup"  onclick="App.setLogStyle('popup')">Popup</button>
+        </div>
+      </div>
+      <div class="settings-option">
+        <div>
+          <div class="settings-option-label">Haptic Feedback</div>
+          <div class="settings-option-sub">Vibration on interactions</div>
+        </div>
+        <div class="haptic-toggle">
+          <input type="checkbox" id="hapticToggle" checked
+            onchange="App.setHaptics(this.checked)">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Data</div>
+      <div class="settings-option">
+        <div>
+          <div class="settings-option-label">Export Logs</div>
+          <div class="settings-option-sub">Download workout history as CSV</div>
+        </div>
+        <button class="toggle-btn" onclick="Storage.exportLogs()">Export</button>
+      </div>
+      <div class="settings-option">
+        <div>
+          <div class="settings-option-label">Clear All Logs</div>
+          <div class="settings-option-sub">Removes all workout history</div>
+        </div>
+        <button class="toggle-btn" onclick="App.confirmClearLogs()"
+          style="color:var(--red);border-color:var(--red);">Clear</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">About</div>
+      <div class="settings-option">
+        <div class="settings-option-label">Version</div>
+        <div class="settings-option-sub" id="appVersion">v1.0.0</div>
+      </div>
+      <div class="settings-option">
+        <div class="settings-option-label">Based on InBody scan</div>
+        <div class="settings-option-sub">21 March 2026</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── CONFIRM POPUP ──────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box">
+    <span class="modal-icon">🗑</span>
+    <div class="modal-title" style="text-align:center;">Are you sure?</div>
+    <div class="modal-message" id="confirmMessage"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel"  onclick="App.closeConfirm()">Cancel</button>
+      <button class="modal-confirm" id="confirmYes">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOG POPUP MODAL ────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="logModal">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="modal-title" id="logModalTitle">Log Exercise</div>
+      <button class="modal-close" onclick="Workout.closeModal()">✕</button>
+    </div>
+    <div class="log-row">
+      <div class="log-input-wrap">
+        <div class="log-label">Weight (kg)</div>
+        <input class="log-input" type="number" id="logModalWeight"
+          placeholder="0 = bodyweight" min="0" step="0.5">
+      </div>
+      <div class="log-input-wrap">
+        <div class="log-label">Reps / Time</div>
+        <input class="log-input" type="text" id="logModalReps"
+          placeholder="e.g. 8 or 45s">
+      </div>
+    </div>
+    <button class="log-save" onclick="Workout.saveFromModal()">Save Session</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- PAGES                                                                    -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ── HOME ──────────────────────────────────────────────────────────────── -->
+<div id="page-home" class="page active">
+
+  <div class="app-header">
+    <div>
+      <div class="app-title">GYM PLAN</div>
+      <div class="app-sub">Push · Pull · Legs — 6 days · Sunday rest</div>
+    </div>
+    <button class="gear-btn" onclick="App.toggleSettings()">⚙</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Weight</div><div class="stat-val" id="statWeight">75.0 kg</div></div>
+    <div class="stat"><div class="stat-label">Body Fat</div><div class="stat-val" id="statBF">24.1%</div></div>
+    <div class="stat"><div class="stat-label">Score</div><div class="stat-val">70/100</div></div>
+    <div class="stat"><div class="stat-label">Height</div><div class="stat-val">178 cm</div></div>
+    <div class="stat"><div class="stat-label">Age</div><div class="stat-val">22</div></div>
+    <div class="stat"><div class="stat-label">Target</div><div class="stat-val">69.7 kg</div></div>
+  </div>
+
+  <div class="week-strip">
+    <div class="wday push"><div class="wday-label">Mon</div><div class="wday-dot"></div><div class="wday-type">Push A</div></div>
+    <div class="wday pull"><div class="wday-label">Tue</div><div class="wday-dot"></div><div class="wday-type">Pull A</div></div>
+    <div class="wday legs"><div class="wday-label">Wed</div><div class="wday-dot"></div><div class="wday-type">Legs A</div></div>
+    <div class="wday push"><div class="wday-label">Thu</div><div class="wday-dot"></div><div class="wday-type">Push B</div></div>
+    <div class="wday pull"><div class="wday-label">Fri</div><div class="wday-dot"></div><div class="wday-type">Pull B</div></div>
+    <div class="wday legs"><div class="wday-label">Sat</div><div class="wday-dot"></div><div class="wday-type">Legs B</div></div>
+    <div class="wday rest"><div class="wday-label">Sun</div><div class="wday-dot"></div><div class="wday-type">Rest</div></div>
+  </div>
+
+  <!-- Today's workout banner -->
+  <div id="todayBanner"></div>
+
+  <!-- Streak -->
+  <div class="streak-card">
+    <div class="streak-fire">🔥</div>
+    <div>
+      <div class="streak-count" id="streakCount">0</div>
+      <div class="streak-label" id="streakLabel">day streak</div>
+    </div>
+  </div>
+
+  <!-- Targets -->
+  <div class="section-hdr">
+    <div class="section-line"></div>
+    <div class="section-label">Targets</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="target-grid">
+    <div class="target-card"><div class="target-arrow down">↓</div><div><div class="target-val">7.6 kg</div><div class="target-desc">Fat to lose</div></div></div>
+    <div class="target-card"><div class="target-arrow up">↑</div><div><div class="target-val">2.3 kg</div><div class="target-desc">Muscle to gain</div></div></div>
+    <div class="target-card"><div class="target-arrow down">↓</div><div><div class="target-val">69.7 kg</div><div class="target-desc">Target weight</div></div></div>
+    <div class="target-card"><div class="target-arrow down">↓</div><div><div class="target-val">&lt;18%</div><div class="target-desc">Target body fat</div></div></div>
+  </div>
+
+  <!-- Cardio -->
+  <div class="section-hdr">
+    <div class="section-line"></div>
+    <div class="section-label">Cardio</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="cardio-card">
+    <div><div class="cardio-name">Jogging</div><div class="cardio-detail">2–3× per week · post workout</div></div>
+    <div class="cardio-kcal">263 kcal/30min</div>
+  </div>
+  <div class="cardio-card">
+    <div><div class="cardio-name">Swimming</div><div class="cardio-detail">Great active recovery</div></div>
+    <div class="cardio-kcal">263 kcal/30min</div>
+  </div>
+  <div class="cardio-card">
+    <div><div class="cardio-name">Jumping Rope</div><div class="cardio-detail">Do post-workout</div></div>
+    <div class="cardio-kcal">263 kcal/30min</div>
+  </div>
+
+</div>
+
+<!-- ── WORKOUT ────────────────────────────────────────────────────────────── -->
+<div id="page-workout" class="page">
+  <div id="dayScroll" class="day-scroll"></div>
+  <div id="dayContent"></div>
+</div>
+
+<!-- ── FUEL ───────────────────────────────────────────────────────────────── -->
+<div id="page-fuel" class="page">
+  <div class="app-header">
+    <div>
+      <div class="app-title">FUEL</div>
+      <div class="app-sub">Personalised for your goals</div>
+    </div>
+    <button class="gear-btn" onclick="App.toggleSettings()">⚙</button>
+  </div>
+  <div id="fuelContent"></div>
+</div>
+
+<!-- ── OVERLOAD ───────────────────────────────────────────────────────────── -->
+<div id="page-overload" class="page">
+  <div class="app-header">
+    <div class="page-title">OVERLOAD</div>
+    <button class="gear-btn" onclick="App.toggleSettings()">⚙</button>
+  </div>
+  <div id="overloadContent"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- BOTTOM NAV                                                               -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-home"     onclick="App.showPage('home')">
+    <span class="nav-icon">⌂</span>Home
+  </button>
+  <button class="nav-btn" id="nav-workout"         onclick="App.showPage('workout'); Workout.init();">
+    <span class="nav-icon">◈</span>Workout
+  </button>
+  <button class="nav-btn" id="nav-fuel"            onclick="App.showPage('fuel')">
+    <span class="nav-icon">⚡</span>Fuel
+  </button>
+  <button class="nav-btn" id="nav-overload"        onclick="App.showPage('overload')">
+    <span class="nav-icon">↑</span>Overload
+  </button>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SCRIPTS — load order matters                                             -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Chart.js for body stats graph -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<!-- Data files first -->
+<script src="data/exercises.js"></script>
+<script src="data/meals.js"></script>
+<script src="data/foodtable.js"></script>
+
+<!-- Modules -->
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+<script src="js/workout.js"></script>
+<script src="js/fuel.js"></script>
+<script src="js/overload.js"></script>
+
+<!-- Boot -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+  });
+</script>
+
+</body>
+</html>
