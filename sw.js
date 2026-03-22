@@ -36,7 +36,10 @@ self.addEventListener('install', event => {
     caches.open(CACHE_STATIC)
       .then(cache => cache.addAll(STATIC_ASSETS))
       .then(() => self.skipWaiting())
-      .catch(err => console.error('Cache install failed:', err))
+      .catch(err => {
+        // Silent fail - could add analytics tracking here
+        // console.error('Cache install failed:', err);
+      })
   );
 });
 
@@ -51,7 +54,8 @@ self.addEventListener('activate', event => {
         keys
           .filter(key => !validCaches.includes(key))
           .map(key => {
-            console.log('Deleting old cache:', key);
+            // Silent cleanup - could add analytics here
+            // console.log('Deleting old cache:', key);
             return caches.delete(key);
           })
       ))

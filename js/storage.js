@@ -29,7 +29,8 @@ const Storage = (() => {
     try {
       const val = localStorage.getItem(key);
       return val ? JSON.parse(val) : null;
-    } catch {
+    } catch (error) {
+      ErrorHandler.handleStorageError('read', key, error);
       return null;
     }
   }
@@ -38,8 +39,8 @@ const Storage = (() => {
     try {
       localStorage.setItem(key, JSON.stringify(value));
       return true;
-    } catch {
-      console.error('Storage write failed:', key);
+    } catch (error) {
+      ErrorHandler.handleStorageError('write', key, error);
       return false;
     }
   }
