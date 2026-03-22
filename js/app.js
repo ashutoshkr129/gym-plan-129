@@ -390,6 +390,7 @@ const App = (() => {
     goToTodayWorkout,
     renderTodayBanner,
     renderStreak,
+    renderHomeStats,
     confirmClearLogs,
     closeConfirm,
     showConfirm,
