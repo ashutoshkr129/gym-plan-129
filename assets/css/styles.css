@@ -611,7 +611,11 @@ strong { font-weight: 500; }
 
 /* ─── DAY CONTENT ──────────────────────────────────────────────────────────── */
 
-#dayContent { padding: 16px; }
+#dayContent { 
+  padding: 16px;
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+}
 
 /* ─── DAY HEADER ───────────────────────────────────────────────────────────── */
 

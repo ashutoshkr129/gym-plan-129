@@ -112,8 +112,8 @@ const Storage = (() => {
     };
     history.push(entry);
     if (history.length > MAX_HISTORY) history.shift();
-    set(KEYS.WORKOUT_LOG + exerciseId, history);
-    return history;
+    const success = set(KEYS.WORKOUT_LOG + exerciseId, history);
+    return success;
   }
 
   function getPersonalBest(exerciseId) {

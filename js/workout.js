@@ -59,9 +59,9 @@ const Workout = (() => {
     if (pill) pill.classList.add('active');
 
     renderDay(dayKey);
-    // scroll workout page to top
-    const workoutPage = document.getElementById('page-workout');
-    if (workoutPage) workoutPage.scrollTop = 0;
+    // scroll day content to top, not the whole page
+    const dayContent = document.getElementById('dayContent');
+    if (dayContent) dayContent.scrollTop = 0;
   }
 
   // ── Render Day ─────────────────────────────────────────────────────────────
@@ -267,15 +267,32 @@ const Workout = (() => {
   function saveLog(exId, exName) {
     const wEl = document.getElementById('w-' + exId);
     const rEl = document.getElementById('r-' + exId);
-    if (!rEl?.value) { App.showToast('Enter reps or time'); return; }
+    
+    if (!rEl?.value) { 
+      App.showToast('Enter reps or time'); 
+      return; 
+    }
+    if (wEl?.value === '' || wEl?.value === null || wEl?.value === undefined) { 
+      App.showToast('Enter weight (0 for bodyweight)'); 
+      return; 
+    }
 
     const weight = wEl?.value || '0';
     const reps   = rEl.value;
     const isPB   = Storage.isPersonalBest(exId, weight);
 
-    Storage.saveLog(exId, weight, reps);
+    const success = Storage.saveLog(exId, weight, reps);
+    if (!success) {
+      App.showToast('Failed to save - storage full?');
+      return;
+    }
+
     renderHistory(exId);
     updatePBBadge(exId);
+
+    // clear inputs
+    if (wEl) wEl.value = '';
+    if (rEl) rEl.value = '';
 
     // close inline
     const inline = document.getElementById('inline-' + exId);
@@ -317,15 +334,31 @@ const Workout = (() => {
     if (!currentModalEx) return;
     const wEl = document.getElementById('logModalWeight');
     const rEl = document.getElementById('logModalReps');
-    if (!rEl?.value) { App.showToast('Enter reps or time'); return; }
+    
+    if (!rEl?.value) { 
+      App.showToast('Enter reps or time'); 
+      return; 
+    }
+    if (wEl?.value === '' || wEl?.value === null || wEl?.value === undefined) { 
+      App.showToast('Enter weight (0 for bodyweight)'); 
+      return; 
+    }
 
-    const isPB = Storage.isPersonalBest(currentModalEx.id, wEl?.value || '0');
-    Storage.saveLog(currentModalEx.id, wEl?.value || '0', rEl.value);
+    const weight = wEl?.value || '0';
+    const reps   = rEl.value;
+    const isPB   = Storage.isPersonalBest(currentModalEx.id, weight);
+
+    const success = Storage.saveLog(currentModalEx.id, weight, reps);
+    if (!success) {
+      App.showToast('Failed to save - storage full?');
+      return;
+    }
+
     renderHistory(currentModalEx.id);
     updatePBBadge(currentModalEx.id);
     closeModal();
 
-    if (isPB && parseFloat(wEl?.value) > 0) {
+    if (isPB && parseFloat(weight) > 0) {
       App.showToast('🏆 New Personal Best!');
       App.haptic('success');
     } else {
