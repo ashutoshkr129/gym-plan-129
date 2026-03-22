@@ -229,7 +229,7 @@ const Overload = (() => {
     const wEl = document.getElementById('statWeight');
     const bEl = document.getElementById('statBF');
 
-    if (!wEl?.value) { App.showToast('Enter your weight'); return; }
+    if (!wEl || wEl.value === "" || isNaN(parseFloat(wEl.value))) { App.showToast('Enter your weight'); return; }
 
     Storage.saveBodyStat(wEl.value, bEl?.value || null);
     App.haptic('success');
