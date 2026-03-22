@@ -90,13 +90,13 @@ const Overload = (() => {
           <div class="log-row">
             <div class="log-input-wrap">
               <div class="log-label">Weight (kg)</div>
-              <input class="log-input" type="number" id="statWeight"
-                placeholder="e.g. 74.5" min="30" max="200" step="0.1">
+              <input class="log-input" type="text" inputmode="decimal" id="statWeight"
+                placeholder="e.g. 74.5">
             </div>
             <div class="log-input-wrap">
               <div class="log-label">Body Fat % (optional)</div>
-              <input class="log-input" type="number" id="statBF"
-                placeholder="e.g. 23.5" min="5" max="50" step="0.1">
+              <input class="log-input" type="text" inputmode="decimal" id="statBF"
+                placeholder="e.g. 23.5">
             </div>
           </div>
           <button class="log-save" onclick="Overload.saveStat()">Save Stats</button>
@@ -226,30 +226,48 @@ const Overload = (() => {
   }
 
   function saveStat() {
-    const wEl = document.getElementById('statWeight');
-    const bEl = document.getElementById('statBF');
+    console.log('[saveStat] called');
 
-    if (!wEl?.value) { App.showToast('Enter your weight'); return; }
+    const container = document.getElementById('overloadContent');
+    console.log('[saveStat] container:', container);
+    if (!container) { App.showToast('Error: container not found'); return; }
 
-    Storage.saveBodyStat(wEl.value, bEl?.value || null);
+    const wEl = container.querySelector('#statWeight');
+    const bEl = container.querySelector('#statBF');
+    console.log('[saveStat] wEl:', wEl);
+    console.log('[saveStat] bEl:', bEl);
+
+    if (!wEl) { App.showToast('Error: input not found'); return; }
+
+    const w = wEl.value.trim();
+    const b = bEl ? bEl.value.trim() : '';
+    console.log('[saveStat] w:', w, '| b:', b);
+
+    if (!w || isNaN(parseFloat(w))) { App.showToast('Enter your weight'); return; }
+
+    Storage.saveBodyStat(w, b || null);
     App.haptic('success');
     App.showToast('Stats saved ✓');
 
     // update display
-    const weightEl = document.getElementById('currentWeight');
-    const bfEl     = document.getElementById('currentBF');
-    if (weightEl) weightEl.textContent = parseFloat(wEl.value).toFixed(1) + ' kg';
-    if (bfEl && bEl?.value) bfEl.textContent = parseFloat(bEl.value).toFixed(1) + '%';
+    const weightEl = container.querySelector('#currentWeight');
+    const bfEl2    = container.querySelector('#currentBF');
+    if (weightEl) weightEl.textContent = parseFloat(w).toFixed(1) + ' kg';
+    if (bfEl2 && b) bfEl2.textContent = parseFloat(b).toFixed(1) + '%';
 
     // update home stats
     App.renderHomeStats();
 
+    // clear inputs
+    wEl.value = '';
+    if (bEl) bEl.value = '';
+
     // close form
-    const form = document.getElementById('statForm');
+    const form = container.querySelector('#statForm');
     if (form) form.style.display = 'none';
 
     // re-render history and chart
-    const histEl = document.querySelector('.stats-history');
+    const histEl = container.querySelector('.stats-history');
     if (histEl) histEl.outerHTML = renderStatsHistory(Storage.getBodyStats());
 
     setTimeout(renderChart, 100);
