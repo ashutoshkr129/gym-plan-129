@@ -515,10 +515,58 @@ const Workout = (() => {
     App.showConfirm(
       `Swap to "${altName}" for this session?`,
       () => {
-        const nameEl = document.querySelector(`#card-${exId} .ex-name`);
+        const card = document.getElementById('card-' + exId);
+        if (!card) return;
+
+        // update name
+        const nameEl = card.querySelector('.ex-name');
         if (nameEl) nameEl.textContent = altName;
+
+        // update description with specific info for common alternatives
+        const descEl = card.querySelector('.ex-desc');
+        if (descEl) {
+          const descriptions = {
+            'Dumbbell Bench Press': 'Lie on bench, press dumbbells from chest to full extension. Allows greater range of motion and stabilizer work.',
+            'Machine Chest Press': 'Seated machine, press handles forward from chest. More stable than free weights, good for beginners or heavy lifting.',
+            'Push-ups': 'Hands shoulder-width, lower chest to floor and press up. Bodyweight alternative that builds chest and core strength.',
+            'Dumbbell Shoulder Press': 'Seated or standing, press dumbbells from shoulder height overhead. Allows natural shoulder movement path.',
+            'Arnold Press': 'Rotate palms from facing to facing away during press. Hits all three deltoid heads for complete shoulder development.',
+            'Machine Shoulder Press': 'Seated machine, press handles overhead. Stable movement for heavy shoulder work without balance requirements.',
+            'Dumbbell Row': 'One knee on bench, pull dumbbell to hip with flat back. Unilateral back work that fixes strength imbalances.',
+            'Lat Pulldown': 'Cable machine, pull bar to upper chest. Great back builder when you can\'t do pull-ups yet.',
+            'Machine Row': 'Seated machine, pull handles to lower chest. Stable alternative to barbell rows for back thickness.',
+            'EZ-Bar Curl': 'EZ bar reduces wrist strain compared to straight bar. Curl from hips to chin with controlled movement.',
+            'Dumbbell Curl': 'Alternate or simultaneous curls, supinate wrist at top. Allows natural wrist position and unilateral work.',
+            'Hammer Curl': 'Neutral grip (palms facing), curl dumbbells. Targets brachialis and brachioradialis for arm thickness.',
+            'Cable Curl': 'Cable provides constant tension throughout movement. Curl bar to chin with strict form.',
+            'Leg Extension': 'Seated machine, extend legs to straight position. Isolated quad work with constant tension.',
+            'Bulgarian Split Squat': 'Rear foot on bench, squat down on front leg. Unilateral leg work that builds balance and strength.',
+            'Goblet Squat': 'Hold dumbbell vertically at chest, squat below parallel. Great for squat depth and upper back posture.',
+            'Lunges': 'Step forward and lower back knee toward floor. Unilateral leg work that improves balance and coordination.',
+            'Leg Press Calf Raises': 'Feet on balls of foot platform, press through calves. Allows heavy calf loading without back strain.',
+            'Seated Calf Raises': 'Seated machine, press through balls of feet. Targets soleus, the lower calf muscle.',
+            'Donkey Calf Raises': 'Bend at hips with partner on back, raise through calves. Traditional bodyweight calf builder.'
+          };
+          
+          descEl.textContent = descriptions[altName] || `${altName} — search for form guides below.`;
+        }
+
+        // update youtube link
+        const links = card.querySelectorAll('.ex-link');
+        if (links[0]) {
+          links[0].href = `https://www.youtube.com/results?search_query=${encodeURIComponent(altName + ' exercise form')}`;
+          links[0].textContent = 'Watch ↗';
+        }
+
+        // update guide link
+        if (links[1]) {
+          links[1].href = `https://musclewiki.com/search?query=${encodeURIComponent(altName)}`;
+          links[1].textContent = 'Guide ↗';
+        }
+
         hideSwap(exId);
         App.showToast(`Swapped to ${altName}`);
+        App.haptic('medium');
       }
     );
   }
