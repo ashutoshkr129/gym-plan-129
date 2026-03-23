@@ -229,12 +229,9 @@ const Workout = (() => {
   function renderCompleteBtn(dayKey, done) {
     return `
       <div class="complete-section">
-        ${done
-          ? `<div class="complete-done">✓ Session Completed</div>`
-          : `<button class="complete-btn" onclick="Workout.markComplete('${dayKey}')">
-               Mark Session Complete
-             </button>`
-        }
+        <button class="complete-btn ${done ? 'completed' : ''}" onclick="Workout.toggleComplete('${dayKey}')">
+          ${done ? '✓ Session Completed' : 'Mark Session Complete'}
+        </button>
       </div>`;
   }
 
@@ -246,6 +243,30 @@ const Workout = (() => {
     App.renderStreak();
     renderDayPills();
     renderDay(dayKey);
+  }
+
+  function unmarkComplete(dayKey) {
+    App.showConfirm(
+      'Mark this session as incomplete?',
+      () => {
+        Storage.unmarkCompleted(dayKey);
+        App.haptic('medium');
+        App.showToast('Session unmarked');
+        App.renderTodayBanner();
+        App.renderStreak();
+        renderDayPills();
+        renderDay(dayKey);
+      }
+    );
+  }
+
+  function toggleComplete(dayKey) {
+    const isCompleted = Storage.isCompleted(dayKey);
+    if (isCompleted) {
+      unmarkComplete(dayKey);
+    } else {
+      markComplete(dayKey);
+    }
   }
 
   // ── Log Handling ───────────────────────────────────────────────────────────
@@ -513,6 +534,8 @@ const Workout = (() => {
     closeModal,
     renderAllHistories,
     markComplete,
+    unmarkComplete,
+    toggleComplete,
     saveNotes,
     startTimer,
     stopTimer,

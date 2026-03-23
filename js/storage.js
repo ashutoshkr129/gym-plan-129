@@ -177,6 +177,13 @@ const Storage = (() => {
     return !!data[dayKey];
   }
 
+  function unmarkCompleted(dayKey) {
+    const todayStr = today();
+    const data = get(KEYS.COMPLETED + todayStr) || {};
+    delete data[dayKey];
+    set(KEYS.COMPLETED + todayStr, data);
+  }
+
   function getWeekCompletions() {
     const result = {};
     for (let i = 0; i < 7; i++) {
@@ -343,7 +350,7 @@ const Storage = (() => {
     // streak
     getStreak, updateStreak,
     // completion
-    markCompleted, isCompleted, getWeekCompletions,
+    markCompleted, unmarkCompleted, isCompleted, getWeekCompletions,
     // body stats
     getBodyStats, saveBodyStat,
     // water
