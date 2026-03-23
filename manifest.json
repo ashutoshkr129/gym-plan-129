@@ -8,6 +8,7 @@
   "background_color": "#0E0E0E",
   "theme_color": "#0E0E0E",
   "lang": "en",
+  "version": "1.0.2",
   "icons": [
     {
       "src": "assets/icons/icon.svg",
