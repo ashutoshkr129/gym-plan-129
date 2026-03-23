@@ -3,9 +3,9 @@
 // Cache-first strategy for assets, network-first for external resources.
 // ──────────────────────────────────────────────────────────────────────────────
 
-const CACHE_NAME    = 'gym-plan-129-v1.0.1';
-const CACHE_STATIC  = 'gym-plan-static-v1.0.1';
-const CACHE_FONTS   = 'gym-plan-fonts-v1.0.1';
+const CACHE_NAME    = 'gym-plan-129-v1.0.2';
+const CACHE_STATIC  = 'gym-plan-static-v1.0.2';
+const CACHE_FONTS   = 'gym-plan-fonts-v1.0.2';
 
 // Core app files — always cache these
 const STATIC_ASSETS = [

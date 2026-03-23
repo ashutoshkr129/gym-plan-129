@@ -217,9 +217,6 @@ const App = (() => {
   // ── Home Stats ─────────────────────────────────────────────────────────────
 
   function renderHomeStats() {
-    const user = Storage.getUser();
-    if (!user) return;
-
     const stats = Storage.getBodyStats();
     if (stats.length) {
       const latest = stats[stats.length - 1];
