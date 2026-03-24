@@ -760,12 +760,30 @@ strong { font-weight: 500; }
   padding:       10px 12px;
   border-radius: 8px;
   border:        0.5px solid var(--border);
-  background:    var(--surface);
-  color:         var(--text);
+  background:    var(--surface1);
+  cursor:        pointer;
   font-size:     14px;
   margin-bottom: 6px;
 }
 .swap-option:active { background: var(--surface3); }
+
+.swap-option.original {
+  border-color: var(--pull);
+  color:        var(--pull);
+  display:      flex;
+  align-items:  center;
+  justify-content: space-between;
+}
+
+.original-badge {
+  font-size:     10px;
+  background:    rgba(74,240,200,0.12);
+  border:        0.5px solid var(--pull);
+  border-radius: 4px;
+  padding:       2px 6px;
+  color:         var(--pull);
+}
+
 .swap-close  { width: 100%; padding: 8px; background: none; border: 0.5px solid var(--border); border-radius: 8px; color: var(--muted2); font-size: 13px; margin-top: 4px; }
 
 /* ─── PB BADGE ─────────────────────────────────────────────────────────────── */

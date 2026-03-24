@@ -188,6 +188,9 @@ const Workout = (() => {
 
         <div class="swap-panel" id="swap-${ex.id}" style="display:none;">
           <div class="swap-title">Alternative Exercises</div>
+          <div class="swap-option original" onclick="Workout.confirmSwap('${ex.id}', '${ex.name}', true)">
+            ${ex.name} <span class="original-badge">Original</span>
+          </div>
           ${ex.alternatives.map(alt => `
             <div class="swap-option" onclick="Workout.confirmSwap('${ex.id}', '${alt}')">
               ${alt}
@@ -511,19 +514,36 @@ const Workout = (() => {
     if (panel) panel.style.display = 'none';
   }
 
-  function confirmSwap(exId, altName) {
-    App.showConfirm(
-      `Swap to "${altName}" for this session?`,
-      () => {
-        const card = document.getElementById('card-' + exId);
-        if (!card) return;
+  function confirmSwap(exId, altName, isOriginal = false) {
+    const message = isOriginal
+      ? `Revert back to original "${altName}"?` 
+      : `Swap to "${altName}" for this session?`;
 
-        // update name
-        const nameEl = card.querySelector('.ex-name');
-        if (nameEl) nameEl.textContent = altName;
+    App.showConfirm(message, () => {
+      const card = document.getElementById('card-' + exId);
+      if (!card) return;
 
+      // update name
+      const nameEl = card.querySelector('.ex-name');
+      if (nameEl) nameEl.textContent = altName;
+
+      const descEl = card.querySelector('.ex-desc');
+      if (isOriginal) {
+        // find original desc from EXERCISES data
+        const dayKey = Object.keys(EXERCISES).find(k =>
+          EXERCISES[k].exercises.some(e => e.id === exId)
+        );
+        const origEx = dayKey
+          ? EXERCISES[dayKey].exercises.find(e => e.id === exId)
+          : null;
+
+        if (descEl && origEx) descEl.textContent = origEx.desc;
+
+        const links = card.querySelectorAll('.ex-link');
+        if (links[0] && origEx) links[0].href = origEx.youtube;
+        if (links[1] && origEx) links[1].href = origEx.guide;
+      } else {
         // update description with specific info for common alternatives
-        const descEl = card.querySelector('.ex-desc');
         if (descEl) {
           const descriptions = {
             'Dumbbell Bench Press': 'Lie on bench, press dumbbells from chest to full extension. Allows greater range of motion and stabilizer work.',
@@ -563,12 +583,12 @@ const Workout = (() => {
           links[1].href = `https://musclewiki.com/search?query=${encodeURIComponent(altName)}`;
           links[1].textContent = 'Guide ↗';
         }
-
-        hideSwap(exId);
-        App.showToast(`Swapped to ${altName}`);
-        App.haptic('medium');
       }
-    );
+
+      hideSwap(exId);
+      App.showToast(isOriginal ? `Reverted to ${altName}` : `Swapped to ${altName}`);
+      App.haptic('medium');
+    });
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────
