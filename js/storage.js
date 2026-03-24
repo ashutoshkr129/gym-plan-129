@@ -21,7 +21,7 @@ const Storage = (() => {
     VERSION:       'gp_version'
   };
 
-  const APP_VERSION = '1.0.4';
+  const APP_VERSION = '1.1.0';
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
